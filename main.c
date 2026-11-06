@@ -1,8 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
 
 // GRUPO: CAUÃ RODRIGUES BORTOLAN RIBEIRO, GUSTAVO HENRIQUE ANTUNES DE LIMA, LUCAS FERNANDES, MATHIAS COLLETTA GUTH DZIURKOWSKI, RAQUEL DA SILVA
 
+#include <stdio.h>
+#include <stdlib.h>
+
 int main(){
-    
+    // fazer menu aqui
 }
