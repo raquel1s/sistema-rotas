@@ -6,7 +6,51 @@
 
 #include "algoritmo.h"
 
-// incluir o código da função
+void calcularAlcancabilidade(int grafo[numVertices][numVertices],
+                             int alcance[numVertices][numVertices]) {
+  int dist[numVertices][numVertices];
+  int i, j;
+
+  floydWarshall(grafo, dist);
+
+  for (i=0; i<numVertices; i++) {
+    for (j=0; j<numVertices; j++) {
+      if(dist[i][j] != INF){
+        alcance[i][j] = 1;
+      }else{
+        alcance[i][j] = 0;
+      }
+    }
+  }
+}
+
+void exibirAlcancabilidade(int grafo[numVertices][numVertices]) {
+  char *siglas[numVertices] = {"Bib", "BlA", "BlB", "Lab", "Ref"};
+  int i, j;
+  int alcance[numVertices][numVertices];
+
+  calcularAlcancabilidade(grafo, alcance);
+
+  printf("\n====== MATRIZ DE ALCANCABILIDADE ======\n\n");
+
+  printf("%-5s", "");
+  for (j = 0; j < numVertices; j++) {
+    printf("%5s", siglas[j]);
+  }
+  printf("\n");
+
+  for (i = 0; i < numVertices; i++) {
+    printf("%-5s", siglas[i]);
+    for (j = 0; j < numVertices; j++) {
+      printf("%5d", alcance[i][j]);
+    }
+    printf("\n");
+  }
+
+  printf("\n1 - Existe caminho\n");
+  printf("0 - Nao existe caminho\n");
+}
+
 void floydWarshall(int grafo[numVertices][numVertices],
                    int dist[numVertices][numVertices]) {
 

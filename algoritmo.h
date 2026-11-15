@@ -11,9 +11,9 @@
 // Número de vértices da matriz
 #define numVertices 5
 
-// definir matriz aqui
+void calcularAlcancabilidade(int grafo[numVertices][numVertices], int alcance[numVertices][numVertices]);
 
-// definir as funções aqui
+void exibirAlcancabilidade(int grafo[numVertices][numVertices]);
 
 void floydWarshall(int grafo[numVertices][numVertices],
                    int dist[numVertices][numVertices]);
