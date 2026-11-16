@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "algoritmo.h"
-
+#include "mapa.h"
 int grafo[numVertices][numVertices] = {
     /*  Bib   BlA   BlB   Lab   Ref */
     {   0,  160,  INF,  INF,  280 },  /* Biblioteca  */
