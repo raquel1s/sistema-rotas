@@ -1,5 +1,4 @@
-
-// GRUPO: CAUÃ RODRIGUES BORTOLAN RIBEIRO, GUSTAVO HENRIQUE ANTUNES DE LIMA, LUCAS FERNANDES, MATHIAS COLLETTA GUTH DZIURKOWSKI, RAQUEL DA SILVA
+/* GRUPO: CAUÃ RODRIGUES BORTOLAN RIBEIRO, GUSTAVO HENRIQUE ANTUNES DE LIMA, LUCAS FERNANDES, MATHIAS COLLETTA GUTH DZIURKOWSKI, RAQUEL DA SILVA */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,35 +9,11 @@
 
 extern DJ list[numVertices];
 
-int grafo[numVertices][numVertices] = {
-    /*  Bib   BlA   BlB   Lab   Ref */
-    {   0,  160,  INF,  INF,  280 },  /* Biblioteca  */
-    { 160,    0,  INF,  210,  190 },  /* Bloco A     */
-    { INF,  INF,    0,  240,  INF },  /* Bloco B     */
-    { INF,  210,  240,    0,  INF },  /* Laboratorio */
-    { 280,  190,  INF,  INF,    0 }   /* Refeitorio  */
-};
-
-static const char *nomesPredios[numVertices] = {
-    "Biblioteca", "Bloco A", "Bloco B", "Laboratorio", "Refeitorio"
-};
-
-/* Nomes na ordem usada pelo Dijkstra (mesma da legenda 1 a 5) */
-static const char *nomesDj[numVertices] = {
-    "Bloco A", "Bloco B", "Laboratorio", "Refeitorio", "Biblioteca"
-};
-
-/* Matriz de alcancabilidade (1 = existe caminho, 0 = nao existe) */
-static int alcance[numVertices][numVertices];
-
-
-
 static char minuscula(char c)
 {
     if (c >= 'A' && c <= 'Z') return (char)(c - 'A' + 'a');
     return c;
 }
-
 
 static int iguais(const char *a, const char *b)
 {
@@ -72,11 +47,11 @@ static void listarPredios(void)
     int i;
     printf("\nPredios disponiveis:\n");
     for (i = 0; i < numVertices; i++)
-        printf("  %d - %s\n", i + 1, nomesPredios[i]);
+        printf("  %d - %s\n", i + 1, nomes[i]);
     printf("\n");
 }
 
-
+/* Le um predio pelo numero (1 a 5) ou pelo nome. Retorna o indice (0 a 4). */
 static int lerPredio(const char *mensagem)
 {
     char linha[100];
@@ -94,7 +69,7 @@ static int lerPredio(const char *mensagem)
                 return num - 1;
         } else {
             for (i = 0; i < numVertices; i++)
-                if (iguais(linha, nomesPredios[i]))
+                if (iguais(linha, nomes[i]))
                     return i;
         }
         printf("Predio invalido! Digite o numero ou o nome.\n");
@@ -116,28 +91,36 @@ static int lerOpcao(void)
     return op;
 }
 
-
+/* Imprime a rota de tras para frente usando o campo deOnde do Dijkstra */
 static void imprimirRotaNomes(int v)
 {
     if (v == -1) return;
     imprimirRotaNomes(list[v].deOnde);
     if (list[v].deOnde != -1) printf(" -> ");
-    printf("%s", nomesDj[v]);
+    printf("%s", nomes[v]);
 }
 
 static void opcaoMenorRota(void)
 {
-    dijkstra();
+    int origem, destino;
+
+    listarPredios();
+    origem = lerPredio("Predio de origem: ");
+    if (origem < 0) return;
+    destino = lerPredio("Predio de destino: ");
+    if (destino < 0) return;
+
+    dijkstra(origem);
 
     printf("\n====== MENOR ROTA ======\n");
-    if (list[destino - 1].distancia == INF) {
+    if (list[destino].distancia == INF) {
         printf("Nao existe caminho entre %s e %s.\n",
-               nomesDj[origem - 1], nomesDj[destino - 1]);
+               nomes[origem], nomes[destino]);
     } else {
-        printf("De %s ate %s\n", nomesDj[origem - 1], nomesDj[destino - 1]);
+        printf("De %s ate %s\n", nomes[origem], nomes[destino]);
         printf("Rota: ");
-        imprimirRotaNomes(destino - 1);
-        printf("\nDistancia total: %d m\n", list[destino - 1].distancia);
+        imprimirRotaNomes(destino);
+        printf("\nDistancia total: %d m\n", list[destino].distancia);
     }
     printf("========================\n");
 }
@@ -145,6 +128,8 @@ static void opcaoMenorRota(void)
 static void opcaoVerificarConexao(void)
 {
     int a, b;
+    /* Matriz de alcancabilidade (1 = existe caminho, 0 = nao existe) */
+    int alcance[numVertices][numVertices];
 
     listarPredios();
     a = lerPredio("Primeiro predio: ");
@@ -152,32 +137,13 @@ static void opcaoVerificarConexao(void)
     b = lerPredio("Segundo predio: ");
     if (b < 0) return;
 
+    calcularAlcancabilidade(grafo, alcance);
+
     printf("\n");
     if (alcance[a][b])
-        printf("Existe caminho entre %s e %s.\n",
-               nomesPredios[a], nomesPredios[b]);
+        printf("Existe caminho entre %s e %s.\n", nomes[a], nomes[b]);
     else
-        printf("NAO existe caminho entre %s e %s.\n",
-               nomesPredios[a], nomesPredios[b]);
-}
-
-static void exibirMatrizAlcancabilidade(void)
-{
-    int i, j;
-
-    printf("\n====== MATRIZ DE ALCANCABILIDADE ======\n\n");
-    printf("%-16s", "");
-    for (i = 0; i < numVertices; i++)
-        printf("%-4d", i + 1);
-    printf("\n");
-    for (i = 0; i < numVertices; i++) {
-        printf("%d - %-12s", i + 1, nomesPredios[i]);
-        for (j = 0; j < numVertices; j++)
-            printf("%-4d", alcance[i][j]);
-        printf("\n");
-    }
-    printf("\n1 - Existe caminho\n0 - Nao existe caminho\n");
-    printf("\n=======================================\n");
+        printf("NAO existe caminho entre %s e %s.\n", nomes[a], nomes[b]);
 }
 
 static void exibirMenu(void)
@@ -197,17 +163,18 @@ int main(void)
 {
     int opcao;
 
-    calcularAlcancabilidade(grafo, alcance);
-
     do {
         exibirMenu();
         opcao = lerOpcao();
 
         switch (opcao) {
-            case 1: exibirMapa();                  break;
-            case 2: opcaoMenorRota();              break;
-            case 3: opcaoVerificarConexao();       break;
-            case 4: exibirMatrizAlcancabilidade(); break;
+            case 1:
+                exibirMapa();
+                exibirConexoes(grafo);
+                break;
+            case 2: opcaoMenorRota();               break;
+            case 3: opcaoVerificarConexao();        break;
+            case 4: exibirAlcancabilidade(grafo);   break;
             case 0: printf("\nEncerrando o programa...\n"); break;
             default: printf("\nOpcao invalida! Tente novamente.\n");
         }

@@ -1,29 +1,26 @@
-// Cauã Rodrigues Bortolan Ribeiro, Gustavo Henrique Antunes de Lima, Lucas
-// Fernandes, Mathias Colletta Guth Dziurkowski, Raquel da Silva
+/* Cauã Rodrigues Bortolan Ribeiro, Gustavo Henrique Antunes de Lima, Lucas Fernandes, Mathias Colletta Guth Dziurkowski, Raquel da Silva */
 
 #ifndef ALGORITMO_H
 #define ALGORITMO_H
 
-// Infinito para o caminho Floyd Warshall
+/* Infinito: representa que nao existe caminho direto */
 #define INF 999999
-// Número de vértices da matriz
+/* Numero de vertices (predios) do grafo */
 #define numVertices 5
 
-extern int origem;
-extern int destino;
+/* Matriz de adjacencia do campus (unica, usada por todos os algoritmos) */
+extern int grafo[numVertices][numVertices];
 
-/*definir matriz aqui*/
-extern const int matrizMap[5][5];
+/* Nomes dos predios, na mesma ordem das linhas/colunas do grafo */
+extern const char *nomes[numVertices];
 
-
-/* definir as funções aqui*/
-void dijkstra();
-void pergunta();
-void legenda();
+/* Dijkstra: calcula a menor distancia da origem ate todos os predios */
+void dijkstra(int origem);
 void recursividade(int menor);
-void imprimirCaminho(int caminho);
 
-void calcularAlcancabilidade(int grafo[numVertices][numVertices], int alcance[numVertices][numVertices]);
+/* Floyd-Warshall e alcancabilidade */
+void calcularAlcancabilidade(int grafo[numVertices][numVertices],
+                             int alcance[numVertices][numVertices]);
 
 void exibirAlcancabilidade(int grafo[numVertices][numVertices]);
 

@@ -1,13 +1,9 @@
-// Cauã Rodrigues Bortolan Ribeiro, Gustavo Henrique Antunes de Lima, Lucas
-// Fernandes, Mathias Colletta Guth Dziurkowski, Raquel da Silva
+/* Cauã Rodrigues Bortolan Ribeiro, Gustavo Henrique Antunes de Lima, Lucas Fernandes, Mathias Colletta Guth Dziurkowski, Raquel da Silva */
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "mapa.h"
-
-static char *nomes[numVertices] = {"Biblioteca", "Bloco A", "Bloco B",
-                                   "Laboratorio", "Refeitorio"};
 
 /* Desenho do campus em ASCII. Os numeros sao as distancias em metros. */
 void exibirMapa(void) {
@@ -35,35 +31,4 @@ void exibirConexoes(int grafo[numVertices][numVertices]) {
       }
     }
   }
-}
-
-/* Matriz com a menor distancia entre todos os pares (Floyd-Warshall) */
-void exibirDistancias(int grafo[numVertices][numVertices]) {
-  int dist[numVertices][numVertices];
-  char *siglas[numVertices] = {"Bib", "BlA", "BlB", "Lab", "Ref"};
-  int i, j;
-
-  floydWarshall(grafo, dist);
-
-  printf("\n====== MENOR DISTANCIA ENTRE LOCAIS (m) ======\n\n");
-
-  printf("%-5s", "");
-  for (j = 0; j < numVertices; j++) {
-    printf("%6s", siglas[j]);
-  }
-  printf("\n");
-
-  for (i = 0; i < numVertices; i++) {
-    printf("%-5s", siglas[i]);
-    for (j = 0; j < numVertices; j++) {
-      if (dist[i][j] == INF) {
-        printf("%6s", "INF");
-      } else {
-        printf("%6d", dist[i][j]);
-      }
-    }
-    printf("\n");
-  }
-
-  printf("\nINF - Nao existe caminho\n");
 }
