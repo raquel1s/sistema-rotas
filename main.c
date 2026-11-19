@@ -6,6 +6,10 @@
 #include <string.h>
 #include "algoritmo.h"
 #include "mapa.h"
+#include "algoritmo_priv.h"
+
+extern DJ list[numVertices];
+
 int grafo[numVertices][numVertices] = {
     /*  Bib   BlA   BlB   Lab   Ref */
     {   0,  160,  INF,  INF,  280 },  /* Biblioteca  */
@@ -19,12 +23,15 @@ static const char *nomesPredios[numVertices] = {
     "Biblioteca", "Bloco A", "Bloco B", "Laboratorio", "Refeitorio"
 };
 
+/* Nomes na ordem usada pelo Dijkstra (mesma da legenda 1 a 5) */
+static const char *nomesDj[numVertices] = {
+    "Bloco A", "Bloco B", "Laboratorio", "Refeitorio", "Biblioteca"
+};
+
 /* Matriz de alcancabilidade (1 = existe caminho, 0 = nao existe) */
 static int alcance[numVertices][numVertices];
 
-/* ================================================================
-   FUNCOES AUXILIARES DO MENU
-   ================================================================ */
+
 
 static char minuscula(char c)
 {
@@ -32,7 +39,7 @@ static char minuscula(char c)
     return c;
 }
 
-/* Compara strings ignorando maiusculas/minusculas (strcasecmp nao e ANSI) */
+
 static int iguais(const char *a, const char *b)
 {
     while (*a && *b) {
@@ -43,7 +50,6 @@ static int iguais(const char *a, const char *b)
     return *a == *b;
 }
 
-/* Remove espacos e \n das pontas */
 static void limpar(char *s)
 {
     int ini = 0, fim = (int)strlen(s) - 1;
@@ -70,8 +76,7 @@ static void listarPredios(void)
     printf("\n");
 }
 
-/* Le um predio por numero (1..N) ou por nome.
-   Retorna o indice 0..N-1, ou -1 se a entrada acabar (EOF). */
+
 static int lerPredio(const char *mensagem)
 {
     char linha[100];
@@ -101,38 +106,42 @@ static int lerOpcao(void)
     char linha[50];
     int op;
 
-    if (fgets(linha, sizeof(linha), stdin) == NULL)
-        return 0;
+    do {
+        if (fgets(linha, sizeof(linha), stdin) == NULL)
+            return 0;
+    } while (linha[0] == '\n' || linha[0] == '\r'); /* ignora linha vazia */
+
     if (sscanf(linha, "%d", &op) != 1)
         return -1;
     return op;
 }
 
-/* ================================================================
-   OPCOES DO MENU
-   ================================================================ */
 
-/* RF02 + RF05: Dijkstra usa as variaveis globais origem e destino */
+static void imprimirRotaNomes(int v)
+{
+    if (v == -1) return;
+    imprimirRotaNomes(list[v].deOnde);
+    if (list[v].deOnde != -1) printf(" -> ");
+    printf("%s", nomesDj[v]);
+}
+
 static void opcaoMenorRota(void)
 {
-    int o, d;
-
-    listarPredios();
-    o = lerPredio("Predio de origem: ");
-    if (o < 0) return;
-    d = lerPredio("Predio de destino: ");
-    if (d < 0) return;
-
-    origem = o;     /* indices 0..4 */
-    destino = d;
+    dijkstra();
 
     printf("\n====== MENOR ROTA ======\n");
-    printf("De %s ate %s\n", nomesPredios[o], nomesPredios[d]);
-    dijkstra();
+    if (list[destino - 1].distancia == INF) {
+        printf("Nao existe caminho entre %s e %s.\n",
+               nomesDj[origem - 1], nomesDj[destino - 1]);
+    } else {
+        printf("De %s ate %s\n", nomesDj[origem - 1], nomesDj[destino - 1]);
+        printf("Rota: ");
+        imprimirRotaNomes(destino - 1);
+        printf("\nDistancia total: %d m\n", list[destino - 1].distancia);
+    }
     printf("========================\n");
 }
 
-/* RF03 + RF05 */
 static void opcaoVerificarConexao(void)
 {
     int a, b;
@@ -152,18 +161,17 @@ static void opcaoVerificarConexao(void)
                nomesPredios[a], nomesPredios[b]);
 }
 
-/* RF04 */
 static void exibirMatrizAlcancabilidade(void)
 {
     int i, j;
 
     printf("\n====== MATRIZ DE ALCANCABILIDADE ======\n\n");
-    printf("%-13s", "");
+    printf("%-16s", "");
     for (i = 0; i < numVertices; i++)
         printf("%-4d", i + 1);
     printf("\n");
     for (i = 0; i < numVertices; i++) {
-        printf("%d - %-9.9s", i + 1, nomesPredios[i]);
+        printf("%d - %-12s", i + 1, nomesPredios[i]);
         for (j = 0; j < numVertices; j++)
             printf("%-4d", alcance[i][j]);
         printf("\n");
