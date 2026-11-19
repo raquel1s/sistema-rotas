@@ -96,9 +96,11 @@ void pergunta(){
     printf("\naonde você vai?");
     scanf("%i",&destino);
     fflush(stdin);
+    if(destino<0 || destino >numVertices);
     printf("\naonde você está");
     scanf("%i",&origem);
     fflush(stdin);
+    if(origem<0 || origem >numVertices);
     
 }
 
